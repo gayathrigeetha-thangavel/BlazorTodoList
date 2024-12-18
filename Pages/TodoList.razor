@@ -4,17 +4,22 @@
 
 <PageTitle>Todo</PageTitle>
 
-<h3>TodoList</h3>
+
+<h1>Todo (@todos.Count(todo => !todo.IsDone))</h1>
 
 <ul>
     @foreach (var todo in todos)
     {
-        <li>@todo.Title</li>
+        <li>
+            <input type="checkbox" @bind="todo.IsDone" />
+            <input @bind="todo.Title" />
+        </li>
     }
 </ul>
 
-<input placeholder="type here" @bind="newTodo" />
+<input placeholder="type your list here" @bind="newTodo" />
 <button @onclick="AddTodo">Add todo</button>
+<button @onclick="RemoveCompletedTodos">Remove completed</button>
 
 @code {
     private List<TodoItem> todos = new();
@@ -27,6 +32,11 @@
             todos.Add(new TodoItem { Title = newTodo });
             newTodo = string.Empty;
         }
-        
+
+    }
+
+    private void RemoveCompletedTodos()
+    {
+        todos = todos.Where(todo => !todo.IsDone).ToList();
     }
 }
