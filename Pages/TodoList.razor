@@ -1,5 +1,7 @@
 ﻿@page "/todolist"
 @using BlazorTodoList.TodoList
+@using System.ComponentModel.DataAnnotations
+@using System;
 
 
 <PageTitle>Todo</PageTitle>
@@ -12,25 +14,47 @@
     {
         <li>
             <input type="checkbox" @bind="todo.IsDone" />
-            <input @bind="todo.Title" />
+            <input @bind="todo.Title" readonly/>
         </li>
     }
 </ul>
 
-<input placeholder="type your list here" @bind="newTodo" />
-<button @onclick="AddTodo">Add todo</button>
+
+<EditForm Model="todoModel" OnValidSubmit="AddTodo">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="name">Add your list:</label>
+        <input placeholder="Type your list here" @bind="todoModel.NewTodo " id="todoList" />
+        <button type="submit">Add todo</button>
+    </div>   
+</EditForm>
+<br />
+
 <button @onclick="RemoveCompletedTodos">Remove completed</button>
 
+
+
 @code {
+
     private List<TodoItem> todos = new();
-    private string? newTodo;
+
+    private TodoModel todoModel = new();
+
+    public class TodoModel
+    {
+        [Required(ErrorMessage = "The todo item is required.")]
+        [StringLength(15, ErrorMessage = "Todo item cannot exceed 15 characters.")]
+        public string? NewTodo { get; set; }
+    }
 
     private void AddTodo()
     {
-        if (!string.IsNullOrWhiteSpace(newTodo))
+        if (!string.IsNullOrWhiteSpace(todoModel.NewTodo))
         {
-            todos.Add(new TodoItem { Title = newTodo });
-            newTodo = string.Empty;
+            todos.Add(new TodoItem { Title = todoModel.NewTodo });
+            todoModel.NewTodo = string.Empty;
         }
 
     }
